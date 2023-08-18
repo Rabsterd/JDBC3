@@ -2,6 +2,7 @@ package edu.kh.emp.model.service;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 
 import static edu.kh.emp.common.JDBCTemplate.*;
 import edu.kh.emp.model.dao.EmployeeDAO;
@@ -97,6 +98,72 @@ public class EmployeeService {
 		
 		
 		return result;
+	}
+
+
+	/** 입력받은 부서와 같은 모든 사원 정보 조회
+	 * @param empId
+	 * @return
+	 */
+	public List<Employee> deptEmployee(String departmentTitle) throws Exception {
+		
+		Connection conn = getConnection();
+		
+		List<Employee> list = dao.deptEmployee(conn, departmentTitle);
+		
+		close(conn);
+		
+		
+		return list;
+	}
+
+
+	public List<Employee> selectSalaryEmp(int salary) throws Exception {
+		
+		Connection conn = getConnection();
+		
+		List<Employee> list = dao.selectSalaryEmp(conn, salary);
+		
+		close(conn);
+		
+
+		return list;
+	}
+
+
+	public Map<String, Integer> sumSalaryEmp() throws Exception {
+		
+		Connection conn = getConnection();
+		
+		Map<String, Integer> map = dao.sumSalaryEmp(conn);
+		
+		close(conn);
+		
+		return map;
+	}
+
+
+	public Employee selectEmpNo(String empNo) throws Exception {
+		
+		Connection conn = getConnection();
+		
+		Employee emp = dao.selectEmpNo(conn, empNo);
+		
+		close(conn);
+		
+		return emp;
+	}
+
+
+	public Map<String, Double> jobNameEmp() throws Exception {
+		
+		Connection conn = getConnection();
+		
+		Map<String, Double> map = dao.jobNameEmp(conn);
+		
+		close(conn);
+		
+		return map;
 	}
 	
 	

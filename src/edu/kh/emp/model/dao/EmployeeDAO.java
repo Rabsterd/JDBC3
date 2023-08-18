@@ -6,7 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static edu.kh.emp.common.JDBCTemplate.*;
@@ -219,5 +221,195 @@ public class EmployeeDAO {
 		}
 		
 		return result;
+	}
+
+	/**
+	 * @param conn
+	 * @param departmentTitle
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Employee> deptEmployee(Connection conn, String departmentTitle) throws Exception {
+
+		List<Employee> empList = new ArrayList<Employee>();
+		
+		try {
+			
+			String sql = prop.getProperty("deptEmployee");
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, departmentTitle);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				int empId = rs.getInt("EMP_ID");
+				String empName = rs.getString("EMP_NAME");
+				String empNo = rs.getString("EMP_NO");
+				String email = rs.getString("EMAIL");
+				String phone = rs.getString("PHONE");
+				String jobName = rs.getString("JOB_NAME");
+				int salary = rs.getInt("SALARY");
+				
+				Employee emp = new Employee(empId, empName, empNo, email,
+						phone, departmentTitle, jobName, salary);
+				
+				empList.add(emp);
+			}
+			
+			
+		} finally {
+			close(pstmt);
+		}
+		
+		return empList;
+	}
+
+	/**
+	 * @param conn
+	 * @param salary
+	 * @return
+	 */
+	public List<Employee> selectSalaryEmp(Connection conn, int salary) throws Exception {
+		
+		List<Employee> empList = new ArrayList<Employee>();
+		
+		try {
+			
+			String sql = prop.getProperty("selectSalaryEmp");
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setInt(1, salary);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				int empId = rs.getInt("EMP_ID");
+				String empName = rs.getString("EMP_NAME");
+				String empNo = rs.getString("EMP_NO");
+				String email = rs.getString("EMAIL");
+				String phone = rs.getString("PHONE");
+				String departmentTitle = rs.getString("DEPT_TITLE");
+				String jobName = rs.getString("JOB_NAME");
+				int selectsalary = rs.getInt("SALARY");
+				
+				Employee emp = new Employee(empId, empName, empNo, email,
+						phone, departmentTitle, jobName, selectsalary);
+				
+				empList.add(emp);
+			}
+			
+			
+		} finally {
+			close(pstmt);
+		}
+		
+
+		
+		return empList;
+	}
+
+	public Map<String, Integer> sumSalaryEmp(Connection conn) throws Exception {
+		
+		Map<String, Integer> map = new LinkedHashMap<String, Integer>();
+		// LinkedHashMap : key 순서가 유지되는 HashMap(ORDER BY 절 결과 그대로 저장함)
+		
+		try {
+			String sql = prop.getProperty("sumSalaryEmp");
+			
+			stmt = conn.createStatement();
+			
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				String deptCode = rs.getString("DEPT_CODE");
+				int total = rs.getInt("TOTAL");
+				
+				map.put(deptCode, total);
+				
+			}
+			
+			
+		} finally {
+			close(stmt);
+		}
+		
+		return map;
+	}
+
+	/** 주민등록번호와 일치하는 사원 정보 조회
+	 * @param conn
+	 * @param empNo
+	 * @return
+	 */
+	public Employee selectEmpNo(Connection conn, String empNo) throws Exception {
+		
+		// 결과 저장용 변수 선언
+		Employee emp = null;
+		
+		try {
+			String sql = prop.getProperty("selectEmpNo");
+			
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, empNo);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				
+				int empId = rs.getInt("EMP_ID");
+				String empName = rs.getString("EMP_NAME");
+				String email = rs.getString("EMAIL");
+				String phone = rs.getString("PHONE");
+				String departmentTitle = rs.getString("DEPT_TITLE");
+				String jobName = rs.getString("JOB_NAME");
+				int selectsalary = rs.getInt("SALARY");
+				
+				emp = new Employee(empId, empName, empNo, email,
+						phone, departmentTitle, jobName, selectsalary);
+				
+				
+			}
+		} finally {
+			close(pstmt);
+		}
+		
+		
+		
+		return emp;
+	}
+
+	/** 직급별 급여 평균 조회 DAO
+	 * @param conn
+	 * @return
+	 */
+	public Map<String, Double> jobNameEmp(Connection conn) throws Exception {
+		
+		Map<String, Double> map = new LinkedHashMap();
+		
+		try {
+			String sql = prop.getProperty("jobNameEmp");
+			
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(sql);
+			
+			while(rs.next()) {
+				String jobName = rs.getString("JOB_NAME");
+				double average = rs.getDouble("AVERAGE");
+				
+				map.put(jobName, average);
+			}
+			
+		} finally {
+			close(stmt);
+		}
+		
+		
+		return map;
 	}
 }
